@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codebase Analysis Report: Multi-Game Platform</title>
+    <style>
+        /* Improved Modern Gaming Theme with Dark Mode */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap');
+
+        :root {
+            --primary-bg: #0A0F1B; /* Darker background */
+            --secondary-bg: #131B2D; /* Content card background */
+            --tertiary-bg: #1D2638;  /* Slightly lighter for elements */
+            --accent-blue: #4F83FF; /* Brighter blue for highlights */
+            --accent-purple: #A174FF; /* Vibrant purple for accents */
+            --accent-pink: #FF4588;   /* Bright pink for contrasting elements */
+            --accent-green: #38D2B0;  /* Teal/green for success states */
+            --text-primary: #F3F8FF;  /* Clear white for primary text */
+            --text-secondary: #A0AABE; /* Softer gray for secondary text */
+            --border-color: #2A3346;   /* Subtle borders */
+            --success-green: #38D2B0;  /* Consistent with accent */
+            --font-family: 'Poppins', sans-serif;
+            --heading-font: 'Montserrat', sans-serif;
+            --card-radius: 16px;
+            --shadow-soft: 0 8px 30px rgba(0,0,0,0.2);
+            --shadow-strong: 0 12px 40px rgba(0,0,0,0.35);
+            --gradient-header: linear-gradient(135deg, #4F83FF, #A174FF, #FF4588);
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: var(--font-family);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1280px; /* Wider for dashboard feel */
+            margin: 30px auto;
+            background-color: transparent; /* Container is just for layout */
+            padding: 0; /* Padding will be on cards */
+            box-shadow: none;
+            border-radius: var(--card-radius);
+        }
+
+        header {
+            background: var(--gradient-header);
+            color: #fff;
+            padding: 2.5em 0;
+            text-align: center;
+            border-radius: var(--card-radius);
+            margin-bottom: 35px;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(255,255,255,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        
+        header h1 {
+            margin: 0;
+            font-size: 3.2em;
+            font-weight: 800;
+            font-family: var(--heading-font);
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 1.3em;
+            opacity: 0.92;
+            margin-top: 0.5em;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            padding: 1.2em;
+            margin-bottom: 35px;
+            border-radius: var(--card-radius);
+            box-shadow: var(--shadow-soft);
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        
+        nav .select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%; 
+            max-width: 380px; /* Adjusted max-width */
+            margin: 5px auto; 
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px; 
+            overflow: hidden; 
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        nav .select-wrapper:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 5px 15px rgba(79, 131, 255, 0.3);
+        }
+
+        nav .select-wrapper::after { /* Custom arrow */
+            content: '\25BC'; 
+            font-size: 0.9em;
+            color: var(--accent-blue);
+            position: absolute;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; 
+            transition: color var(--transition-speed) ease;
+        }
+        
+        nav .select-wrapper:hover::after {
+            color: var(--accent-purple);
+        }
+
+        nav #navigationSelect {
+            width: 100%;
+            padding: 16px 50px 16px 28px;
+            border: none;
+            background-color: transparent;
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            font-weight: 500;
+            font-size: 1.05em;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            outline: none; /* Remove focus outline */
+        }
+
+        nav #navigationSelect option {
+            background-color: var(--secondary-bg); 
+            color: var(--text-primary);
+            padding: 14px;
+        }
+
+        .content-section {
+            display: none;
+            padding: 35px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--card-radius);
+            margin-bottom: 30px;
+            background-color: var(--secondary-bg);
+            box-shadow: var(--shadow-soft);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--accent-blue);
+            border-bottom: 3px solid var(--accent-purple);
+            padding-bottom: 12px;
+            margin-top: 0;
+            font-size: 2.2em;
+            font-weight: 700;
+            font-family: var(--heading-font);
+        }
+        
+        h3 {
+            color: var(--accent-purple);
+            margin-top: 30px;
+            font-size: 1.6em;
+            font-weight: 600;
+        }
+        
+        h4 {
+            color: var(--text-primary);
+            font-size: 1.3em;
+            font-weight: 500;
+            margin-top: 22px;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none; /* Removing default bullets */
+            padding-left: 0;
+        }
+        
+        li {
+            margin-bottom: 14px;
+            padding-left: 28px;
+            position: relative;
+        }
+        
+        li::before { /* Custom bullet */
+            content: '◆';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-size: 1.2em;
+            line-height: 1;
+        }
+
+        code {
+            background-color: var(--tertiary-bg);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            color: var(--accent-pink);
+            border: 1px solid var(--border-color);
+        }
+
+        .tech-stack span, .feature span {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: 10px 18px;
+            margin: 6px;
+            border-radius: 24px; /* Pill shape */
+            font-size: 0.95em;
+            font-weight: 500;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        
+        .tech-stack span:hover, .feature span:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .complexity-meter {
+            width: 100%;
+            background-color: var(--tertiary-bg);
+            border-radius: 10px;
+            margin: 18px 0;
+            padding: 4px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .complexity-bar {
+            height: 28px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-pink));
+            border-radius: 6px;
+            text-align: center;
+            color: white;
+            line-height: 28px;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: width 1.8s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 2px 8px rgba(255, 69, 136, 0.4);
+        }
+        
+        /* Enhanced Chart Placeholder Styling */
+        .chart-placeholder {
+            width: 100%;
+            min-height: 320px; /* Taller for better visual */
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column; /* Stack title and "chart" */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 25px;
+            border-radius: var(--card-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-soft);
+            font-style: normal; /* Remove italic */
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        
+        .chart-placeholder .chart-title {
+            font-size: 1.4em;
+            color: var(--text-primary);
+            margin-bottom: 18px;
+            font-weight: 600;
+            font-family: var(--heading-font);
+        }
+        
+        .chart-placeholder .chart-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 90%;
+        }
+        
+        .chart-placeholder .static-chart-area {
+            width: 85%;
+            height: 190px;
+            background: rgba(13, 17, 27, 0.4); /* Slightly transparent */
+            border-radius: 10px;
+            display: flex;
+            align-items: flex-end; /* For bar charts */
+            justify-content: space-around; /* For bar charts */
+            padding: 15px;
+            margin: 18px 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Example static bar for placeholders */
+        .static-bar {
+            background-color: var(--accent-blue);
+            width: 15%;
+            border-radius: 6px 6px 0 0;
+            animation: riseUp 1.2s ease-out;
+        }
+        
+        @keyframes riseUp {
+            from { height: 0%; opacity: 0;}
+            to { opacity: 1;}
+        }
+        
+        /* Example static line for placeholders */
+        .static-line-graph {
+            width: 85%;
+            height: 180px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            position: relative;
+            margin: 15px 0;
+            padding: 15px;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(42, 51, 70, 0.5),
+                rgba(42, 51, 70, 0.5) 1px,
+                transparent 1px,
+                transparent 20px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                rgba(42, 51, 70, 0.5),
+                rgba(42, 51, 70, 0.5) 1px,
+                transparent 1px,
+                transparent 20px
+            );
+        }
+        
+        .static-line-graph svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .static-line-graph .line {
+            fill: none;
+            stroke: var(--accent-pink);
+            stroke-width: 3;
+            stroke-dasharray: 500;
+            stroke-dashoffset: 500;
+            animation: drawLine 2.5s ease-out forwards;
+        }
+        
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        
+        .static-line-graph .point {
+            fill: var(--accent-blue);
+            stroke: var(--primary-bg);
+            stroke-width: 2;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 18px;
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for rounded corners */
+            border-spacing: 0;
+            margin-top: 25px;
+            border-radius: var(--card-radius);
+            overflow: hidden; /* For rounded corners on table */
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+        }
+        
+        th, td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px; /* More padding */
+            text-align: left;
+            background-color: var(--tertiary-bg);
+        }
+        
+        th {
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); /* Header background */
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        td { color: var(--text-secondary); }
+        tr:last-child td { border-bottom: none; }
+        
+        tbody tr:hover td {
+            background-color: rgba(42, 51, 70, 0.8); /* Slightly lighter on hover */
+            color: var(--text-primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: auto; /* Pushes footer to bottom */
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            background-color: var(--secondary-bg);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        footer p { margin: 5px 0; }
+
+        /* Game-type icons */
+        .game-icon {
+            font-size: 2.2em;
+            margin-right: 15px;
+            vertical-align: middle;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                width: 96%;
+                padding: 10px;
+            }
+            header h1 {
+                font-size: 2.3em;
+            }
+            header p {
+                font-size: 1em;
+            }
+            nav {
+                flex-direction: column;
+                padding: 1em;
+            }
+            nav .select-wrapper { /* Ensure dropdown also scales if needed */
+                max-width: 100%;
+            }
+            h2 {
+                font-size: 1.8em;
+            }
+            h3 {
+                font-size: 1.4em;
+            }
+            .content-section {
+                padding: 22px;
+            }
+            .chart-placeholder {
+                padding: 18px 12px; /* Reduced horizontal padding on mobile */
+            }
+            .chart-placeholder .static-chart-area, .chart-placeholder .static-line-graph {
+                width: 100%; /* Make chart areas take full available width within padded parent */
+            }
+            .tech-stack span, .feature span {
+                padding: 8px 14px;
+                margin: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Multi-Game Platform Analysis</h1>
+        <p>A comprehensive look at a feature-rich gaming platform with multiple game modes, real-time multiplayer, and in-game economy</p>
+    </header>
+
+    <div class="container">
+        <nav id="navigation">
+            <div class="select-wrapper">
+                <select id="navigationSelect">
+                    <option value="overview" selected>Overview</option>
+                    <option value="architecture">Architecture</option>
+                    <option value="frontend">Frontend</option>
+                    <option value="backend">Backend</option>
+                    <option value="database">Data Tier</option>
+                    <option value="complexity">Complexity</option>
+                    <option value="expandability">Future Scope</option>
+                </select>
+            </div>
+        </nav>
+
+        <section id="overview" class="content-section active">
+            <h2>Project Overview & Core Dynamics</h2>
+            <p>This codebase implements a sophisticated <strong>Multi-Game Platform</strong> featuring multiple real-time multiplayer games. It's a feature-rich application engineered for real-time, multiplayer interactions, underpinned by an in-game "gem" economy and robust user account management via Firebase.</p>
+            
+            <h3>Core Concept & Engagement Loop:</h3>
+            <p>The platform centers on a collection of multiplayer games where participants use "gems" - an in-game currency. Players can compete across various game types, from skill-based to strategic ones. Winners claim a significant portion of the pot, while the "house" retains a nominal fee from each game. This design fosters an engaging economic loop, encouraging repeated play and strategic wagering across different game modes.</p>
+
+            <h3>Available Games:</h3>
+            <ul>
+                <li><span class="game-icon">🪨</span><strong>Rock Paper Scissors:</strong> A three-player variant with unique twists, including move locks and bonus rounds.</li>
+                <li><span class="game-icon">🐍</span><strong>Snake Game:</strong> A multiplayer version where players must eliminate opponents by making them crash into their snake body.</li>
+                <li><span class="game-icon">💰</span><strong>Split or Steal:</strong> A game of trust and betrayal based on a player reputation system that affects rewards.</li>
+                <li><span class="game-icon">👝</span><strong>Mr. Wallet:</strong> A bidding game where players invest gems, and the highest investor wins the entire pot (minus fees).</li>
+                <li><span class="game-icon">🍎</span><strong>Poison Apple:</strong> A chance-based game where players pick apples but must avoid the poisoned ones.</li>
+                <li><span class="game-icon">⛳</span><strong>Golf Drive:</strong> A timing-based skill game to hit the perfect golf shot by stopping a moving power meter.</li>
+            </ul>
+
+            <h3>Key Identified Features:</h3>
+            <div class="feature">
+                <span>Multiple Game Types</span>
+                <span>Real-time Multiplayer (Socket.IO)</span>
+                <span>2-3+ Player Matches</span>
+                <span>"Gem" Based In-Game Economy</span>
+                <span>Secure User Authentication (Firebase)</span>
+                <span>Integrated Chat Functionality</span>
+                <span>Persistent Game & User Data (Firestore)</span>
+                <span>Rich Animations & Graphics</span>
+                <span>Responsive UI (MUI, Tailwind)</span>
+                <span>Immersive Sound & Emojis</span>
+                <span>API Rate Limiting (Security)</span>
+                <span>Scalability Features (Redis)</span>
+            </div>
+
+            <h3>Project Maturity & Operational Readiness:</h3>
+            <p>The project demonstrates a high degree of maturity, indicating it's either deployed or poised for deployment. Evidence includes:</p>
+            <ul>
+                <li>Clear architectural separation: Frontend SPA, dedicated Game Server with separate game services for each game type, and Backend (Firebase BaaS).</li>
+                <li>Comprehensive deployment documentation for Firebase services and the game server.</li>
+                <li>Proactive data management: Automated and manual cleanup processes for Firestore, crucial for cost and performance.</li>
+                <li>Scalability foresight: Game server architecture anticipating Redis for enhanced performance.</li>
+                <li>Structured codebase with reusable components, services, and hooks specific to each game type.</li>
+                <li>Adoption of modern, robust technologies: TypeScript, Vite, React, Node.js, suggesting a focus on quality and maintainability.</li>
+            </ul>
+            <p>The presence of detailed documentation like <code>DEPLOYMENT_INSTRUCTIONS.md</code> and <code>CLEANUP_README.md</code> signifies a well-maintained project or a meticulously prepared handoff, underscoring its advanced state. Each game is implemented as a standalone component with its own backend service, showing careful planning for expansion and modularity.</p>
+        </section>
+
+        <section id="architecture" class="content-section">
+            <h2>System Architecture: A Multi-Game Service Platform</h2>
+            <p>The application architecturally employs a modular, service-oriented design, artfully blending a dedicated real-time game server (with individual game services) with serverless functions and managed cloud services. This hybrid strategy effectively balances the high-performance demands of real-time gaming with the scalability and operational ease offered by serverless and BaaS components.</p>
+
+            <div class="chart-placeholder" id="archDiagram">
+                <div class="chart-title">Multi-Game System Architecture</div>
+                <div class="static-line-graph">
+                    <svg viewBox="0 0 200 130">
+                        <!-- Client to various services -->
+                        <line class="line" x1="20" y1="65" x2="70" y2="30" />
+                        <line class="line" x1="20" y1="65" x2="70" y2="65" />
+                        <line class="line" x1="20" y1="65" x2="70" y2="100" />
+                        
+                        <!-- Game Services to State Management -->
+                        <line class="line" x1="70" y1="30" x2="130" y2="30" />
+                        <line class="line" x1="70" y1="65" x2="130" y2="65" />
+                        <line class="line" x1="70" y1="100" x2="130" y2="100" />
+                        
+                        <!-- State Management to Persistence -->
+                        <line class="line" x1="130" y1="30" x2="175" y2="45" />
+                        <line class="line" x1="130" y1="65" x2="175" y2="45" />
+                        <line class="line" x1="130" y1="100" x2="175" y2="85" />
+                        
+                        <!-- Nodes -->
+                        <circle class="point" cx="20" cy="65" r="3" /><text x="10" y="75" font-size="7" fill="var(--text-secondary)">Client</text>
+                        <circle class="point" cx="70" cy="30" r="3" /><text x="60" y="25" font-size="7" fill="var(--text-secondary)">Game Services</text>
+                        <circle class="point" cx="70" cy="65" r="3" /><text x="55" y="75" font-size="7" fill="var(--text-secondary)">Firebase Hosting</text>
+                        <circle class="point" cx="70" cy="100" r="3" /><text x="60" y="110" font-size="7" fill="var(--text-secondary)">FB Functions</text>
+                        <circle class="point" cx="130" cy="30" r="3" /><text x="120" y="25" font-size="7" fill="var(--text-secondary)">Game Logic</text>
+                        <circle class="point" cx="130" cy="65" r="3" /><text x="120" y="75" font-size="7" fill="var(--text-secondary)">Socket Handlers</text>
+                        <circle class="point" cx="130" cy="100" r="3" /><text x="120" y="110" font-size="7" fill="var(--text-secondary)">API Endpoints</text>
+                        <circle class="point" cx="175" cy="45" r="3" /><text x="165" y="40" font-size="7" fill="var(--text-secondary)">Firestore</text>
+                        <circle class="point" cx="175" cy="85" r="3" /><text x="165" y="95" font-size="7" fill="var(--text-secondary)">Redis (Planned)</text>
+                    </svg>
+                </div>
+                <div class="chart-content">
+                    This diagram illustrates the service-oriented architecture: The Client (React SPA on Firebase Hosting) interacts with multiple Game Services within the Node.js/Socket.IO Game Server. Each game has its own dedicated service implementing specific game logic and state management. All services interface with Firestore for data persistence, with Redis planned for game state optimization.
+                    <br><small>(A dynamic visualization library could better illustrate how different game services interact with shared resources and handle player state.)</small>
+                </div>
+            </div>
+
+            <h3>Core Architectural Pillars:</h3>
+            <ul>
+                <li><strong>Client (Frontend SPA):</strong> A React and TypeScript Single Page Application, efficiently served via Firebase Hosting. It manages the UI, user interactions, and real-time communication with the Game Server and Firebase services. Each game has dedicated components but shares UI elements, authentication, and economic features.</li>
+                
+                <li><strong>Multi-Service Game Server (`game-server/`):</strong> A Node.js application leveraging Express and Socket.IO, organized as distinct services:
+                    <ul>
+                        <li><strong>Core Service Layer:</strong> Handles user connections, authentication, and general game session management.</li>
+                        <li><strong>Game-Specific Services:</strong> Separate services for each game type (RockPaperScissors, Snake, SplitOrSteal, MrWallet, PoisonApple, GolfGame) implementing unique game mechanics.</li>
+                        <li><strong>Economic Service:</strong> The GemService manages the in-game currency across all games, tracking bets, payouts, and balances.</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Firebase Backend-as-a-Service (BaaS):</strong>
+                    <ul>
+                        <li><strong>Firebase Authentication:</strong> Securely manages user identity (sign-up, login, sessions).</li>
+                        <li><strong>Firestore:</strong> Scalable NoSQL database for persistent storage of user profiles, game history, chat logs, etc.</li>
+                        <li><strong>Firebase Cloud Functions:</strong> Serverless TypeScript functions handling asynchronous tasks, API endpoints not suited for the game server (e.g., scheduled cleanups).</li>
+                        <li><strong>Firebase Hosting:</strong> Globally distributes static client application assets (HTML, CSS, JS).</li>
+                    </ul>
+                </li>
+                
+                <li><strong>Redis (Strategic Implementation):</strong> An in-memory data store, identified for future integration to manage ephemeral active game state. This significantly boosts performance and scalability for the game server by offloading Firestore.</li>
+            </ul>
+            
+            <h3>Game Service Modularity:</h3>
+            <p>The architecture implements a service-oriented design pattern for game management. Each game type has its own:</p>
+            <ul>
+                <li><strong>Backend Service:</strong> A dedicated TypeScript class (e.g., <code>GameService</code>, <code>SnakeGameService</code>, <code>GolfGameService</code>) managing game state, rules, and real-time communication.</li>
+                <li><strong>Frontend Component:</strong> React component (e.g., <code>RockPaperScissors.tsx</code>, <code>SnakeGame.tsx</code>) handling UI rendering, animations, and player interactions.</li>
+                <li><strong>State Model:</strong> TypeScript interfaces defining game-specific state structure.</li>
+                <li><strong>Socket Handlers:</strong> Custom event handlers for each game's unique real-time interactions.</li>
+            </ul>
+            <p>This modular approach enables easy maintenance, independent scaling of popular games, and seamless addition of new games to the platform.</p>
+            
+            <h3>Deployment Strategy Overview:</h3>
+            <ul>
+                <li><strong>Frontend:</strong> Built with Vite, deployed to Firebase Hosting for global CDN delivery.</li>
+                <li><strong>Game Server:</strong> Architected for deployment on platforms like Heroku, AWS, or DigitalOcean, utilizing PM2 for process management and Nginx for reverse proxying.</li>
+                <li><strong>Firebase Services:</strong> Cloud Functions, Firestore rules, and indexes are deployed using the Firebase CLI.</li>
+                <li><strong>Netlify Considerations:</strong> The presence of <code>netlify.toml</code> suggests potential use for CI/CD, staging environments, or past hosting strategies, though primary operations appear Firebase-centric.</li>
+            </ul>
+        </section>
+
+        <section id="frontend" class="content-section">
+            <h2>Frontend Deep Dive: The Multi-Game Hub (Client)</h2>
+            <p>The frontend is a cutting-edge React Single Page Application (SPA) meticulously crafted with TypeScript, ensuring type safety and enhancing long-term maintainability. It leverages Vite for an optimized development experience and performant production builds, while providing a sleek, unified interface for multiple game types.</p>
+
+            <h3>Core Technology Stack:</h3>
+            <div class="tech-stack">
+                <span>React 19</span>
+                <span>TypeScript</span>
+                <span>Vite</span>
+                <span>Material UI (MUI)</span>
+                <span>Tailwind CSS</span>
+                <span>React Router DOM</span>
+                <span>Socket.IO Client</span>
+                <span>Framer Motion (Animations)</span>
+                <span>Axios (HTTP)</span>
+                <span>Lucide Icons</span>
+                <span>React Hot Toast</span>
+                <span>UseSound (Audio Effects)</span>
+                <span>Emoji Picker React</span>
+            </div>
+
+            <h3>Game-Specific Component Architecture:</h3>
+            <p>The frontend organizes game components in a modular fashion, combining shared infrastructure with game-specific implementations:</p>
+            <table>
+                <thead>
+                    <tr><th>Game Type</th><th>Main Component</th><th>Special Features</th><th>Complexity</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rock Paper Scissors</td>
+                        <td><code>RockPaperScissors.tsx</code></td>
+                        <td>Move locking mechanism, bonus rounds, 3-player synchronized turns</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Snake Game</td>
+                        <td><code>SnakeGame.tsx</code></td>
+                        <td>Canvas-based rendering, real-time collision detection, respawn logic</td>
+                        <td>Very High</td>
+                    </tr>
+                    <tr>
+                        <td>Split or Steal</td>
+                        <td><code>SplitOrSteal.tsx</code></td>
+                        <td>Reputation system, visual indicators, decision history</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Mr. Wallet</td>
+                        <td><code>MrWallet.tsx</code></td>
+                        <td>Timed bidding, investment visualization, outcome calculation</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Poison Apple</td>
+                        <td><code>PoisonApple.tsx</code></td>
+                        <td>Grid-based selection, probability visualization, turn skipping</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Golf Drive</td>
+                        <td><code>GolfDrive.tsx</code></td>
+                        <td>Timing mechanics, power meter, shot physics, environmental effects</td>
+                        <td>High</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Shared Component Infrastructure:</h3>
+            <ul>
+                <li><strong>Game Rules Component:</strong> A centralized system (<code>GameRules.tsx</code>) providing consistent rule display across all game types.</li>
+                <li><strong>Game Chat:</strong> Reusable chat functionality that works across all game sessions.</li>
+                <li><strong>Game Room:</strong> Unified lobby and game room management components.</li>
+                <li><strong>UI Elements:</strong> Shared countdown timers, buttons, cards, and notification components.</li>
+            </ul>
+
+            <h3>Key Functional Responsibilities:</h3>
+            <ul>
+                <li>Rendering game-specific UIs while maintaining consistent platform experience.</li>
+                <li>Managing client-side navigation and state for multiple game types.</li>
+                <li>Establishing and maintaining real-time communication with different game services via Socket.IO.</li>
+                <li>Interfacing with Firebase for user authentication and data operations (profiles, leaderboards).</li>
+                <li>Delivering rich user experiences through game-appropriate animations, sound effects, and visual feedback.</li>
+                <li>Adapting to different game mechanics while providing a consistent economic interface for gem wagering and rewards.</li>
+            </ul>
+
+            <h3>Code Structure Analysis (`src/` directory):</h3>
+            <p>The frontend codebase exhibits a well-organized structure, adhering to established React development paradigms for clarity and scalability:</p>
+            <table>
+                <thead>
+                    <tr><th>Directory/File</th><th>Purpose & Significance</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>main.tsx</code></td><td>Application's primary entry point; initializes React and global providers.</td></tr>
+                    <tr><td><code>App.tsx</code></td><td>Root component; orchestrates routing, global layout, and core context providers.</td></tr>
+                    <tr><td><code>components/games/</code></td><td>Contains individual game components, each implementing specific game mechanics and UI.</td></tr>
+                    <tr><td><code>components/</code></td><td>Houses reusable UI elements shared across the platform (buttons, cards, layout components).</td></tr>
+                    <tr><td><code>pages/</code></td><td>Top-level view components mapping to application routes (Home, GameLobby, UserProfile).</td></tr>
+                    <tr><td><code>hooks/</code></td><td>Custom React Hooks encapsulating reusable stateful logic and game-specific behaviors.</td></tr>
+                    <tr><td><code>services/</code></td><td>Modules abstracting API interactions, Socket.IO event handlers, and game-specific service functions.</td></tr>
+                    <tr><td><code>contexts/</code></td><td>React Context API providers managing global state (auth status, theme, game settings, active game).</td></tr>
+                    <tr><td><code>types/</code></td><td>Centralized TypeScript interfaces and types for game states, player data, and API responses.</td></tr>
+                    <tr><td><code>utils/</code></td><td>General-purpose utility functions, game helpers, and constants.</td></tr>
+                    <tr><td><code>styles/</code>, <code>index.css</code></td><td>Global stylesheets and Tailwind CSS base/custom configurations.</td></tr>
+                    <tr><td><code>config/</code></td><td>Client-side application configurations, Firebase setup, environment variables.</td></tr>
+                </tbody>
+            </table>
+            
+            <h3>User Experience (UX) Excellence:</h3>
+            <ul>
+                <li><strong>Game-Specific Visual Design:</strong> Each game maintains its unique visual identity while adhering to the platform's overall aesthetic, creating both variety and cohesion.</li>
+                <li><strong>MUI & Tailwind CSS Synergy:</strong> This combination provides robust, pre-styled components from Material UI, while Tailwind CSS enables rapid customization for game-specific interfaces.</li>
+                <li><strong>Animated Gameplay:</strong> Framer Motion implements fluid animations for game elements, transitions between states, and victory/defeat sequences.</li>
+                <li><strong>Audio Feedback System:</strong> UseSound creates immersive audio cues specific to each game type, enhancing player engagement.</li>
+                <li><strong>Social Features:</strong> Integrated chat, emojis, and player interaction tools create a multiplayer community feel across different game types.</li>
+                <li><strong>Consistent Economic Interface:</strong> Despite the variety of games, gem wagering, rewards, and balances are presented through a unified economic interface.</li>
+            </ul>
+            <p>The frontend excels at maintaining the delicate balance between game-specific uniqueness and platform-wide consistency, creating a cohesive yet diverse gaming experience.</p>
+        </section>
+
+        <section id="backend" class="content-section">
+            <h2>Backend Architecture: Multi-Game Service Platform</h2>
+            <p>The backend is strategically organized into a service-oriented architecture with game-specific services, supported by Firebase serverless components. This approach enables specialized game logic while leveraging shared infrastructure for authentication, persistence, and scaling.</p>
+
+            <h3>1. Game Server Architecture (`game-server/`)</h3>
+            <p>This Node.js, Express, and Socket.IO-powered server forms the operational core for real-time multiplayer gameplay across multiple game types. It's designed for responsiveness, scalability, and extensibility through a modular service design.</p>
+            
+            <h4>Technology Stack:</h4>
+            <div class="tech-stack">
+                <span>Node.js</span>
+                <span>Express.js</span>
+                <span>TypeScript</span>
+                <span>Socket.IO</span>
+                <span>Firebase Admin SDK</span>
+                <span>Redis (Planned)</span>
+                <span>Dotenv</span>
+                <span>CORS</span>
+                <span>Express Rate Limit</span>
+            </div>
+            
+            <h4>Core Game Services Architecture:</h4>
+            <p>The server implements multiple specialized game services, each handling unique game logic and state management:</p>
+            <table>
+                <thead>
+                    <tr><th>Service</th><th>Responsibility</th><th>Key Features</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>GameService</code></td>
+                        <td>Rock Paper Scissors game logic</td>
+                        <td>Round management, move locking, bonus rounds, 3-player dynamics</td>
+                    </tr>
+                    <tr>
+                        <td><code>SnakeGameService</code></td>
+                        <td>Snake game physics and collision detection</td>
+                        <td>Real-time movement, collision handling, respawn mechanics, arena management</td>
+                    </tr>
+                    <tr>
+                        <td><code>SplitOrStealService</code></td>
+                        <td>Split or Steal game decision processing</td>
+                        <td>Reputation tracking, reward calculation based on player history</td>
+                    </tr>
+                    <tr>
+                        <td><code>WalletService</code></td>
+                        <td>Mr. Wallet bidding game</td>
+                        <td>Timed investment periods, bid tracking, winner determination</td>
+                    </tr>
+                    <tr>
+                        <td><code>PoisonAppleService</code></td>
+                        <td>Poison Apple game state management</td>
+                        <td>Apple grid generation, poisoned apple placement, turn management</td>
+                    </tr>
+                    <tr>
+                        <td><code>GolfGameService</code></td>
+                        <td>Golf Drive game physics</td>
+                        <td>Power meter mechanics, shot physics, environmental factors</td>
+                    </tr>
+                    <tr>
+                        <td><code>GemService</code></td>
+                        <td>Cross-game economy management</td>
+                        <td>Gem transactions, wager handling, payout calculations, balance tracking</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h4>Shared Server Infrastructure:</h4>
+            <ul>
+                <li><strong>Socket Management:</strong> Central connection handling, room assignment, and event propagation.</li>
+                <li><strong>Authentication Layer:</strong> Verifies Firebase auth tokens and maintains user identity across socket connections.</li>
+                <li><strong>Game Handlers:</strong> Routes socket events to appropriate game services based on game type.</li>
+                <li><strong>API Gateway:</strong> RESTful endpoints for game creation, joining, and status inquiries across all game types.</li>
+            </ul>
+
+            <h4>Socket.IO Event Architecture:</h4>
+            <p>The server uses a sophisticated event system to manage different game types through a unified Socket.IO interface:</p>
+            <ul>
+                <li><strong>Common Events:</strong> Events like <code>joinGame</code>, <code>leaveGame</code>, and <code>playerReady</code> are standardized across all games.</li>
+                <li><strong>Game-Specific Events:</strong> Each game service registers custom events (e.g., <code>makeChoice</code> for Rock Paper Scissors, <code>changeDirection</code> for Snake).</li>
+                <li><strong>Event Routing:</strong> The main socket handler dynamically routes events to appropriate game services based on the game ID's prefix or explicit game type parameter.</li>
+            </ul>
+
+            <h4>Game State Management:</h4>
+            <ul>
+                <li><strong>Service-Specific State:</strong> Each game service maintains its own state models and collections (e.g., <code>activeGames</code> Maps).</li>
+                <li><strong>Type Safety:</strong> TypeScript interfaces define game-specific state structures (e.g., <code>RockPaperScissorsState</code>, <code>SnakeGameState</code>).</li>
+                <li><strong>Persistence Strategy:</strong> Critical state changes are persisted to Firestore while ephemeral game state is managed in-memory (with Redis planned for scaling).</li>
+                <li><strong>Timeout Management:</strong> Each game service implements appropriate timers for game stages, turns, and session cleanup.</li>
+            </ul>
+
+            <h3>2. Firebase Cloud Services Integration</h3>
+            <p>The platform leverages Firebase's comprehensive suite of backend services to complement the game server:</p>
+            
+            <h4>Key Firebase Components:</h4>
+            <ul>
+                <li><strong>Authentication:</strong> Secure player identity management across all games and services.</li>
+                <li><strong>Firestore:</strong> Long-term storage for user profiles, gem balances, game history, and leaderboards.</li>
+                <li><strong>Cloud Functions:</strong> Serverless operations for tasks not requiring the real-time game server:
+                    <ul>
+                        <li><strong>Scheduled Data Cleanup:</strong> Regular purging of stale game sessions and chat logs.</li>
+                        <li><strong>User Management:</strong> Account creation hooks, profile updates, and administrative functions.</li>
+                        <li><strong>Analytics Processing:</strong> Aggregation of game statistics and platform metrics.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>Deployment & Scaling Strategy:</h4>
+            <p>The project's architecture enables flexible deployment and scaling approaches:</p>
+            <ul>
+                <li><strong>Game Server Deployment:</strong> Designed for container-based or VM deployment with process management via PM2 and request routing through Nginx.</li>
+                <li><strong>Horizontal Scaling:</strong> The clear separation between games enables individual scaling of popular game types.</li>
+                <li><strong>Redis Integration:</strong> Planned implementation of Redis will allow distributed state management, supporting multiple game server instances.</li>
+                <li><strong>Firebase Automatic Scaling:</strong> The Firebase components automatically scale with demand, requiring minimal operational oversight.</li>
+            </ul>
+            <p>This sophisticated backend architecture balances the need for specialized game logic with operational efficiency and scalability, setting the foundation for a robust multi-game platform.</p>
+        </section>
+
+        <section id="database" class="content-section">
+            <h2>Data Tier & Cloud Services Strategy</h2>
+            <p>The project strategically leverages the comprehensive Firebase suite for its backend services, augmented by a planned Redis integration for optimizing real-time performance at scale.</p>
+
+            <h3>Firebase Suite - The Backbone:</h3>
+            <ul>
+                <li>
+                    <strong>Firestore (Primary Datastore):</strong>
+                    <p>The core NoSQL document database, chosen for its scalability, real-time capabilities, and flexible schema. It stores:</p>
+                    <ul>
+                        <li>User profiles (demographics, preferences, gem balances, linked to Firebase Auth UIDs).</li>
+                        <li>Detailed game history (participants, choices, outcomes, timestamps).</li>
+                        <li>Chat messages associated with specific game sessions or globally.</li>
+                        <li>Game session metadata (status, creation/completion times for cleanup and analytics).</li>
+                    </ul>
+                    <p>Security is enforced via <code>firestore.rules</code>, ensuring granular data access control. Query performance is optimized through predefined indexes in <code>firestore.indexes.json</code>.</p>
+                </li>
+                <li>
+                    <strong>Firebase Authentication (Identity Management):</strong>
+                    <p>Handles the entire user identity lifecycle: secure sign-up, sign-in (supporting various providers), and session management. This abstracts the complexities of building and maintaining a secure authentication system.</p>
+                </li>
+                <li>
+                    <strong>Firebase Cloud Functions (Serverless Compute):</strong> (Detailed in Backend section) Crucial for serverless backend logic, particularly for data lifecycle management and asynchronous tasks.
+                </li>
+                <li>
+                    <strong>Firebase Hosting (Content Delivery):</strong>
+                    <p>Serves the compiled static assets (HTML, CSS, JavaScript) of the React frontend application. Provides a global CDN for low-latency content delivery to users worldwide.</p>
+                </li>
+            </ul>
+
+            <h3>Redis (Planned Performance Enhancement):</h3>
+            <p>The inclusion of the <code>redis</code> dependency and its mention in game server documentation signifies a well-thought-out strategy for scaling real-time operations.</p>
+            <ul>
+                <li><strong>Strategic Purpose:</strong> To manage ephemeral, frequently accessed data such as active game states (current players, choices in ongoing rounds), player session information for the real-time game server, and potentially rate-limiting counters.</li>
+                <li><strong>Anticipated Benefits:</strong> Offloading this volatile data from Firestore will significantly reduce Firestore read/write operations and costs, drastically improve response times for critical game actions, and enable the game server to scale more effectively by allowing shared state across multiple instances.</li>
+            </ul>
+            <p>This foresight in planning for Redis integration highlights a mature understanding of potential performance bottlenecks in purely database-driven real-time systems as user load increases.</p>
+            
+            <h3>Data Governance & Maintenance:</h3>
+            <p>A standout feature is the explicit and robust data cleanup strategy, detailed in <code>CLEANUP_README.md</code>, indicating a commitment to operational excellence.</p>
+            <ul>
+                <li>Automated daily (or other scheduled interval) cleanup of old game sessions and associated chat data via a scheduled Cloud Function.</li>
+                <li>Manual cleanup capabilities via an HTTP-triggered Cloud Function for administrative intervention.</li>
+                <li>Game and chat documents are designed with metadata like <code>status</code> and timestamps to facilitate efficient and accurate cleanup operations.</li>
+            </ul>
+            <p>This proactive approach to data management is crucial for long-term application health, cost optimization, and sustained performance.</p>
+        </section>
+
+        <section id="complexity" class="content-section">
+            <h2>Codebase Complexity & Development Investment</h2>
+            
+            <h3>Overall Complexity Assessment: <span id="complexity-level-text" style="color: var(--accent-pink);">Very High</span></h3>
+            <div class="complexity-meter">
+                <div class="complexity-bar" id="complexity-bar-overall" style="width: 95%;">95% - Enterprise-Grade Platform</div>
+            </div>
+            <p>This project represents an <strong>exceptionally high level of complexity</strong>, extending far beyond a typical gaming application. The sophistication stems from the combination of multiple distinct game types, each with its own logic, within a unified platform architecture:</p>
+            <ul>
+                <li><strong>Multi-Game Integration:</strong> Supporting six different game types with diverse mechanics (turn-based, real-time, skill-based, chance-based) under a single coherent platform.</li>
+                <li><strong>Real-time Multiplayer Engine:</strong> Implementing resilient real-time interactions with Socket.IO, managing concurrent user states across different game types, and ensuring data consistency across clients.</li>
+                <li><strong>Service-Oriented Architecture:</strong> Coordinating operations between game-specific services while maintaining shared infrastructure for authentication, economic features, and data persistence.</li>
+                <li><strong>Complex Game-Specific Logic:</strong> Each game implements intricate mechanics - from physics simulation in Snake and Golf to reputation systems in Split or Steal, probabilistic outcomes in Poison Apple, and strategic dynamics in Rock Paper Scissors.</li>
+                <li><strong>Visual & Interactive Richness:</strong> Creating unique yet cohesive visual identities and interaction models for different games while maintaining platform consistency.</li>
+                <li><strong>Full-Stack TypeScript Implementation:</strong> Leveraging TypeScript across the entire stack with specialized type systems for each game, ensuring type safety between frontend and backend.</li>
+                <li><strong>Unified Economy System:</strong> Implementing a gem-based economic system that works consistently across different game types with varied winning conditions, bet amounts, and payout calculations.</li>
+            </ul>
+
+            <h3>Component-Level Complexity Analysis:</h3>
+            
+            <h4>1. Frontend Game Components:</h4>
+            <table>
+                <thead>
+                    <tr><th>Game Component</th><th>Complexity Level</th><th>Key Complexity Factors</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Snake Game (61KB, 1488 lines)</td>
+                        <td>Very High</td>
+                        <td>Canvas rendering, real-time physics, collision detection, game loop optimization</td>
+                    </tr>
+                    <tr>
+                        <td>Rock Paper Scissors (47KB, 1152 lines)</td>
+                        <td>High</td>
+                        <td>Multi-player state synchronization, complex outcome rules, move locking, bonus rounds</td>
+                    </tr>
+                    <tr>
+                        <td>Golf Drive (Golf folder)</td>
+                        <td>High</td>
+                        <td>Physics simulation, timing mechanism, visual effects, environmental factors</td>
+                    </tr>
+                    <tr>
+                        <td>Mr. Wallet (26KB, 654 lines)</td>
+                        <td>Medium-High</td>
+                        <td>Timed bidding system, financial calculations, risk assessment visualization</td>
+                    </tr>
+                    <tr>
+                        <td>Poison Apple (19KB, 490 lines)</td>
+                        <td>Medium</td>
+                        <td>Grid-based interaction, probability management, turn-based flow</td>
+                    </tr>
+                    <tr>
+                        <td>Split or Steal (16KB, 401 lines)</td>
+                        <td>Medium</td>
+                        <td>Reputation system tracking, conditional reward logic, opponent analysis</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h4>2. Backend Game Services:</h4>
+            <table>
+                <thead>
+                    <tr><th>Game Service</th><th>Complexity Level</th><th>Key Complexity Factors</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GolfGameService (80KB, 1563 lines)</td>
+                        <td>Very High</td>
+                        <td>Player physics modeling, environmental factors, turn management, scoring system</td>
+                    </tr>
+                    <tr>
+                        <td>GameService (RPS) (75KB, 1534 lines)</td>
+                        <td>Very High</td>
+                        <td>Multiple gameplay modes, circular win logic, bonus/malus system, multi-round tracking</td>
+                    </tr>
+                    <tr>
+                        <td>SnakeGameService (60KB, 1442 lines)</td>
+                        <td>Very High</td>
+                        <td>Game loop optimization, collision detection, multi-snake tracking, respawn mechanics</td>
+                    </tr>
+                    <tr>
+                        <td>SplitOrStealService (41KB, 927 lines)</td>
+                        <td>High</td>
+                        <td>Player reputation tracking, history-based decisions, conditional reward distribution</td>
+                    </tr>
+                    <tr>
+                        <td>WalletService (30KB, 765 lines)</td>
+                        <td>High</td>
+                        <td>Timed bidding mechanism, investment validation, winner determination, fee calculation</td>
+                    </tr>
+                    <tr>
+                        <td>PoisonAppleService (27KB, 773 lines)</td>
+                        <td>High</td>
+                        <td>Randomized board generation, item value calculation, turn sequencing, skip mechanics</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>3. Cross-Game Infrastructure:</h4>
+            <p><strong>Shared Services (GemService, User Management):</strong> Very High complexity. These services must coordinate economic activities and user state across multiple game types with different mechanics and reward systems.
+                <div class="complexity-meter"><div class="complexity-bar" style="width: 90%;">90%</div></div>
+            </p>
+            <p><strong>Socket Handler Architecture:</strong> Very High complexity. The routing system must efficiently direct events to the appropriate game services while maintaining session consistency and authentication state.
+                <div class="complexity-meter"><div class="complexity-bar" style="width: 92%;">92%</div></div>
+            </p>
+            <p><strong>UI Component Integration:</strong> High complexity. Creating a unified interface that accommodates diverse game mechanics while maintaining visual cohesion and navigation fluidity.
+                <div class="complexity-meter"><div class="complexity-bar" style="width: 85%;">85%</div></div>
+            </p>
+
+            <h3>Estimated Development Investment:</h3>
+            <p>Based on the feature depth, architectural complexity, and multi-game scope:</p>
+            <ul>
+                <li><strong>Team Size Estimation:</strong> A project of this scope and complexity likely required a small team of 3-5 experienced developers with specialized roles:
+                    <ul>
+                        <li>1-2 frontend developers focusing on game UI/UX and animations</li>
+                        <li>1-2 backend developers implementing game services and Socket.IO architecture</li>
+                        <li>1 full-stack developer handling shared infrastructure, authentication, and deployment</li>
+                    </ul>
+                </li>
+                <li><strong>Development Timeline:</strong> Given the multiple game types and sophisticated architecture, a conservative estimate for development time would be <strong>8-12+ months</strong> for the initial platform with core games, with additional games possibly added incrementally.</li>
+                <li><strong>Effort Estimation:</strong> Total developer hours likely exceed <strong>2,500-3,500+ hours</strong>, encompassing architecture design, individual game implementation, shared services development, integration testing, and deployment setup.</li>
+            </ul>
+            <p>The modular architecture suggests an intentional strategy of building a scalable platform that can accommodate new games with minimal changes to core infrastructure. While this increased initial development investment, it enables more efficient addition of new game types in the future.</p>
+
+            <h3>Architectural Complexity Visualization:</h3>
+            <div class="chart-placeholder" id="complexityVisualization">
+                <div class="chart-title">Multi-Game Platform Complexity Distribution</div>
+                <div class="static-chart-area" style="height: 250px;">
+                    <!-- Simulated bar chart showing complexity distribution -->
+                    <div class="static-bar" style="height: 95%; background: linear-gradient(to top, var(--accent-blue), var(--accent-purple));" title="Snake Game: 95%"></div>
+                    <div class="static-bar" style="height: 93%; background: linear-gradient(to top, var(--accent-blue), var(--accent-purple));" title="Golf Drive: 93%"></div>
+                    <div class="static-bar" style="height: 90%; background: linear-gradient(to top, var(--accent-blue), var(--accent-purple));" title="RPS Game: 90%"></div>
+                    <div class="static-bar" style="height: 85%; background: linear-gradient(to top, var(--accent-blue), var(--accent-pink));" title="Mr. Wallet: 85%"></div>
+                    <div class="static-bar" style="height: 80%; background: linear-gradient(to top, var(--accent-blue), var(--accent-pink));" title="Split or Steal: 80%"></div>
+                    <div class="static-bar" style="height: 78%; background: linear-gradient(to top, var(--accent-blue), var(--accent-pink));" title="Poison Apple: 78%"></div>
+                    <div class="static-bar" style="height: 95%; background: linear-gradient(to top, var(--accent-purple), var(--accent-green));" title="Shared Infrastructure: 95%"></div>
+                </div>
+                <div class="chart-content">
+                    This visualization represents the relative complexity of different game components and the shared infrastructure. The real-time games (Snake, Golf Drive) and the shared platform infrastructure show the highest complexity, while simpler turn-based games show relatively lower but still substantial complexity.
+                </div>
+            </div>
+
+            <h3>Development Progression Assessment:</h3>
+            <p>Analysis of the codebase structure and commit patterns suggests a methodical, incremental development approach:</p>
+            <ol>
+                <li><strong>Core Platform (Foundation):</strong> Initial development likely focused on shared infrastructure—authentication, UI framework, and economic system.</li>
+                <li><strong>First Game Implementation:</strong> Rock Paper Scissors appears to be the earliest implemented game, serving as a proof of concept for the platform.</li>
+                <li><strong>Architecture Refinement:</strong> Service-oriented architecture was likely established after initial game validation, creating templates for new game integration.</li>
+                <li><strong>Incremental Game Additions:</strong> Additional games were built on the established foundation, becoming progressively more complex (from turn-based to real-time).</li>
+                <li><strong>Platform Maturation:</strong> Refinement of shared services, administrative tools, and deployment processes to support the growing game catalog.</li>
+            </ol>
+            <p>The current state of the codebase suggests the platform is in an advanced stage of development, with a solid foundation for ongoing expansion with new game types.</p>
+        </section>
+
+        <section id="expandability" class="content-section">
+            <h2>Expandability & Future Potential: A Growing Game Platform</h2>
+            <p>The existing architecture's modular, service-oriented design provides an exceptional foundation for continued expansion, both in adding new games and enhancing existing ones. The platform is clearly architected with future growth in mind.</p>
+
+            <h3>Core Strengths for Expansion:</h3>
+            <ul>
+                <li><strong>Game Service Template Pattern:</strong> The consistent implementation of game services (each with similar interfaces but unique logic) creates a de-facto template for adding new games.</li>
+                <li><strong>Component Isolation:</strong> Each game exists in its own component and service files with minimal cross-dependencies, allowing individual games to be upgraded or replaced with minimal impact.</li>
+                <li><strong>Shared Infrastructure:</strong> Authentication, economy, chat, and UI frameworks are implemented as platform-level services available to all games.</li>
+                <li><strong>TypeScript Interfaces:</strong> Game state interfaces provide clear contracts between frontend and backend, ensuring type safety when adding new game features.</li>
+                <li><strong>Socket Event Architecture:</strong> The event routing system is designed to accommodate different event types for various games through a single connection.</li>
+            </ul>
+
+            <h3>Future Game Expansion Possibilities:</h3>
+            <div class="chart-placeholder">
+                <div class="chart-title">Potential New Game Types</div>
+                <div class="static-chart-area" style="flex-direction: row; align-items: center; justify-content: space-evenly; flex-wrap: wrap; height: auto; padding: 25px;">
+                    <div style="text-align: center; padding: 15px; background: rgba(42, 51, 70, 0.4); border-radius: 12px; margin: 8px; flex: 0 1 auto; min-width: 150px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🃏</div>
+                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 5px;">Card Games</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);"> Hearts</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(42, 51, 70, 0.4); border-radius: 12px; margin: 8px; flex: 0 1 auto; min-width: 150px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🎲</div>
+                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 5px;">Dice Games</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">Yahtzee, Craps, Farkle</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(42, 51, 70, 0.4); border-radius: 12px; margin: 8px; flex: 0 1 auto; min-width: 150px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🎯</div>
+                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 5px;">Target Games</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">Darts, Archery, Basketball</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(42, 51, 70, 0.4); border-radius: 12px; margin: 8px; flex: 0 1 auto; min-width: 150px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🧩</div>
+                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 5px;">Puzzle Games</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">Word Games, Pattern Matching</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(42, 51, 70, 0.4); border-radius: 12px; margin: 8px; flex: 0 1 auto; min-width: 150px;">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🏎️</div>
+                        <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 5px;">Racing Games</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">Kart Racing, Circuit Racing</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h4>Implementation Process for New Games:</h4>
+            <ol>
+                <li><strong>Create Game Service:</strong> Implement a new TypeScript service class following the existing pattern (state management, event handlers, game logic).</li>
+                <li><strong>Define Game State Interface:</strong> Create TypeScript interfaces defining the game's state structure and player actions.</li>
+                <li><strong>Implement Frontend Component:</strong> Build a React component for the game UI, using the shared infrastructure for authentication, chat, and economic features.</li>
+                <li><strong>Register Socket Handlers:</strong> Add game-specific event handlers in the central socket management system.</li>
+                <li><strong>Add Game Rules:</strong> Update the GameRules component to include instructions for the new game.</li>
+                <li><strong>Integrate with Economy:</strong> Configure bet amounts, winning conditions, and payout calculations for the new game.</li>
+            </ol>
+            <p>This modular approach means new games can be added incrementally without disrupting existing functionality.</p>
+
+            <h3>Platform Enhancement Opportunities:</h3>
+            <ul>
+                <li><strong>Enhanced Social Features:</strong> Friends lists, spectator mode, clans/teams, and private tournaments could enrich the community aspect.</li>
+                <li><strong>Advanced Matchmaking:</strong> Skill-based matchmaking across games, with ELO or similar rating systems for competitive play.</li>
+                <li><strong>Tournament System:</strong> Structured competitions with brackets, entry fees, and prize pools.</li>
+                <li><strong>Achievements & Progression:</strong> Cross-game achievement systems, player levels, and unlockable cosmetics.</li>
+                <li><strong>Mobile App Adaptation:</strong> Converting the platform to a Progressive Web App (PWA) or building native mobile versions.</li>
+                <li><strong>AI Opponents:</strong> Computer-controlled players for practice or when human opponents are unavailable.</li>
+            </ul>
+
+            <h3>Technical Scaling Roadmap:</h3>
+            <ul>
+                <li><strong>Redis Implementation:</strong> Completing the Redis integration for distributed state management and improved performance.</li>
+                <li><strong>Horizontal Scaling:</strong> Load balancing across multiple game server instances, potentially with game-specific clusters.</li>
+                <li><strong>Microservices Evolution:</strong> Further decomposing the monolithic game server into truly independent microservices if traffic demands.</li>
+                <li><strong>Enhanced Analytics:</strong> Implementing game telemetry and player behavior analytics for data-driven feature development.</li>
+                <li><strong>GraphQL API Layer:</strong> Adding a GraphQL interface for more efficient data retrieval across game types.</li>
+            </ul>
+
+            <h3>Monetization Opportunities:</h3>
+            <ul>
+                <li><strong>Premium Cosmetics:</strong> Non-gameplay-affecting visual enhancements purchasable with real money or earned gems.</li>
+                <li><strong>Battle Pass:</strong> Seasonal progression systems with exclusive rewards for active players.</li>
+                <li><strong>Gem Packages:</strong> Direct purchase of in-game currency to participate in higher-stakes games.</li>
+                <li><strong>Premium Game Types:</strong> Exclusive game modes for subscribers or one-time purchasers.</li>
+                <li><strong>Tournament Entry Fees:</strong> Special competitive events with entry costs and substantial prizes.</li>
+            </ul>
+
+            <h3>Anticipated Challenges:</h3>
+            <p>While the architecture is well-suited for expansion, several challenges may arise:</p>
+            <ul>
+                <li><strong>Game Balancing:</strong> Ensuring each game provides appropriate risk/reward in the unified economy system.</li>
+                <li><strong>Scaling Complexity:</strong> Managing the growing complexity as more game types are added to the platform.</li>
+                <li><strong>Feature Coherence:</strong> Maintaining consistent quality and feature parity across an expanding game library.</li>
+                <li><strong>Performance Optimization:</strong> Ensuring the platform remains responsive as the user base and game variety grow.</li>
+                <li><strong>Browser Compatibility:</strong> Supporting different game types across various browsers and device capabilities.</li>
+            </ul>
+            <p>Despite these challenges, the codebase demonstrates remarkable foresight in its architecture. The platform is clearly designed with expansion in mind, positioning it well for incremental growth and evolution into a comprehensive multi-game ecosystem.</p>
+        </section>
+
+        <footer>
+            <p><strong>Multi-Game Platform Analysis</strong> • <span id="lastUpdatedDate">Generated on June 15, 2023</span></p>
+            <p>A comprehensive architectural and complexity assessment of a modern multiplayer gaming platform</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navigationSelect = document.getElementById('navigationSelect');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function triggerAnimations(sectionElement) {
+                if (!sectionElement) return;
+
+                const barsInTarget = sectionElement.querySelectorAll('.complexity-bar');
+                barsInTarget.forEach(bar => {
+                    const originalWidth = bar.style.width;
+                    bar.style.width = '0%';
+                    void bar.offsetWidth; // Force reflow
+                    bar.style.width = originalWidth;
+                });
+
+                const svgsInTarget = sectionElement.querySelectorAll('.static-line-graph svg .line');
+                svgsInTarget.forEach(line => {
+                    line.style.animation = 'none';
+                    void line.offsetWidth; // Trigger reflow
+                    line.style.animation = ''; // Re-apply animation
+                });
+            }
+
+            function setActiveSection(targetId, isInitialLoad = false) {
+                    contentSections.forEach(section => section.classList.remove('active'));
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    
+                    if (navigationSelect && navigationSelect.value !== targetId) {
+                       navigationSelect.value = targetId;
+                    }
+                    
+                    if (isInitialLoad) {
+                        setTimeout(() => triggerAnimations(targetSection), 100);
+                    } else {
+                        triggerAnimations(targetSection);
+                    }
+                }
+            }
+
+            if (navigationSelect) {
+                const initialTargetId = navigationSelect.value;
+                // The HTML already has the #overview section with the .active class by default.
+                // We call setActiveSection to ensure consistency and trigger animations.
+                setActiveSection(initialTargetId, true); 
+
+                navigationSelect.addEventListener('change', (event) => {
+                    const targetId = event.target.value;
+                    setActiveSection(targetId);
+                });
+            } 
+
+            const lastUpdatedElem = document.getElementById('lastUpdatedDate');
+            if(lastUpdatedElem) {
+                lastUpdatedElem.textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            }
+
+            // Initial trigger for animations on visible complexity bars (e.g., in the default active section)
+            setTimeout(() => {
+                const visibleBars = document.querySelectorAll('.content-section.active .complexity-bar');
+                visibleBars.forEach(bar => {
+                     const originalWidth = bar.style.width;
+                     bar.style.width = '0%';
+                     void bar.offsetWidth; 
+                     bar.style.width = originalWidth;
+                });
+                const visibleSVGLines = document.querySelectorAll('.content-section.active .static-line-graph svg .line');
+                 visibleSVGLines.forEach(line => {
+                    line.style.animation = 'none';
+                    void line.offsetWidth; 
+                    line.style.animation = ''; 
+                });
+            }, 100); // Short delay to ensure styles are applied
+        });
+    </script>
+</body>
+</html> 
